@@ -12,12 +12,11 @@ def is_valid_mul(index, line):
     return 0
 
 def check_enabled(index, line):
-    old_enabled = enabled
     if re.search(r'^do\(\)', line[index:]):
         return True
     if re.search(r'^don\'t\(\)', line[index:]):
         return False
-    return old_enabled
+    return enabled
 
 with open('input.txt', 'r') as file:
     for line in file:
