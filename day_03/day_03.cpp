@@ -12,6 +12,10 @@ std::regex pattern_dont(R"(^don\'t\(\))");
 
 std::string readFile(const std::string& filename) {
 	std::ifstream file(filename);
+	if (!file.is_open()) {
+		std::cerr << "Error: could not open file" << std::endl;
+		exit(1);
+	}
 	std::stringstream buffer;
 	buffer << file.rdbuf();
 	return buffer.str();
