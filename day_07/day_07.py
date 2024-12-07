@@ -29,9 +29,9 @@ def evaluate_equation(data):
 
     return result == data[0]
 
-def find_operators(data, operators):
+def find_correct_operators(data, operators):
 
-    def backtrack_multiplications(pos, operators):
+    def backtrack(pos, operators):
         if pos >= len(data[2]):
             return int(data[0]) if evaluate_equation(data) else 0
 
@@ -39,7 +39,7 @@ def find_operators(data, operators):
 
         for operator in operators:
             data[2][pos] = operator
-            res = backtrack_multiplications(pos + 1, operators)
+            res = backtrack(pos + 1, operators)
             if res: return res
 
         data[2][pos] = operator
@@ -47,13 +47,13 @@ def find_operators(data, operators):
 
     for i in range(len(data[1])  - 1):
         data[2].append("+") 
-    return backtrack_multiplications(0, operators)
+    return backtrack(0, operators)
 
 def sum_results(filename, operators):
     data = parse_input(filename)
     sum = 0
     for i in range(len(data)):
-        sum += find_operators(data[i], operators)
+        sum += find_correct_operators(data[i], operators)
     return sum
 
 test = True if len(sys.argv) == 2 and sys.argv[1] == "test" else False
