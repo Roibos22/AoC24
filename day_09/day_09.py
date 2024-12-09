@@ -52,16 +52,15 @@ def part_one(data):
             line = remove_dots_at_back(line)
     return get_checksum(line)
 
-spaces_index = 0
-
-def get_upcoming_spaces(line, i):
-    global spaces_index
-    spaces_index = i  # Start counting from current position
-    count = 0
-    while((spaces_index + count < len(line)) and line[spaces_index + count] == '.'):
-        count += 1
-    print(f"Found {count} spaces at index {spaces_index}")
-    return count
+def get_upcoming_spaces(line, needed_spaces):
+    for i in range(len(line)):
+        if line[i] == '.':
+            count = 0
+            while((i + count < len(line)) and line[i + count] == '.'):
+                count += 1
+            if count >= needed_spaces:
+                return count, i
+    return 0, 0
 
 def insert_block_at_index(line, block, i):
     while block[1] > 0:
@@ -73,32 +72,16 @@ def insert_block_at_index(line, block, i):
     return line
 
 def part_two(data):
-    global spaces_index
-    spaces_index = 0  # Initialize once at start
     line = create_line(data)
-    print(line)
-    # iterate over data from end
     for block in reversed(data):
-        print(block)
-        upcoming_spaces = get_upcoming_spaces(line, spaces_index)
-        while (upcoming_spaces < block[1] or spaces_index > block[3]) and spaces_index < len(line):  # Add length check
-            spaces_index += 1
-            upcoming_spaces = get_upcoming_spaces(line, spaces_index)
-            
-        if upcoming_spaces >= block[1] and spaces_index <= block[3]:
-            line = insert_block_at_index(line, block, spaces_index)
-    print(line)
+        spaces, space_index = get_upcoming_spaces(line, block[1])
+        if spaces >= block[1] and space_index <= block[3]:
+            line = insert_block_at_index(line, block, space_index)
     return get_checksum(line)
-    # get checksum
 
 def main():
-    global spaces_index
     data = parse_data()
-    # print(data)
-    
-    part_one(data)
     print("#1 -> ", part_one(data))
-    spaces_index = 0
     print("#2 -> ", part_two(data))
 
 main()
