@@ -11,6 +11,18 @@ dirs = (
         ( 0, +1)
 )
 
+# corner_dirs = (
+#     (-0.5 , -0.5), (+0.5, -0.5),
+#     (-0.5 , +0.5), (+0.5, +0.5)
+# )
+
+corner_dirs = (
+    (-0.5, -0.5),  # top-left
+    (-0.5, +0.5),  # bottom-left
+    (+0.5, +0.5),  # bottom-right
+    (+0.5, -0.5)   # top-right
+)
+
 def in_range(x, y):
     return (
         x >= 0 and
@@ -58,15 +70,46 @@ def part_one(map):
     return (calc_price(areas, map))
 
 def part_two(map):
-    print(map)
+    price = 0
+    print(areas)
+    for area in areas:
+        corners = 0
+        area_char = map[area[0][1]][area[0][0]]
+        # print(area_char)
+        area_corners = set()
+        # print(area)
+        for pos in area:
+            for dir in corner_dirs:
+                area_corners.add((pos[0] + dir[0], pos[1] + dir[1]))
+        # print("area corners", area_corners)
+        for corner in area_corners:
+            # for each touching field of a corner in a region create config of 'if are same area'
+            # print(corner)
+            config = []
+            for dir in corner_dirs:
+                pos = [int(corner[0] + dir[0]), int(corner[1] + dir[1])]
+                # print(pos)
+                config.append(True) if in_range(pos[0], pos[1]) and area_char == map[pos[1]][pos[0]] else config.append(False)
+            count = sum(config)
+            # print("corner", corner, "has conf ", config)
+            if count == 1:
+                corners += 1
+            elif count == 2:
+                if config == [True, False, True, False] or config == [False, True, False, True]:
+                    corners += 2
+            elif count == 3:
+                corners += 1
+        # print(corners)
+        print("area ", area_char, corners, len(area))
+        price += corners * len(area)
+    return price
     # count corners
     # for every pos check to 
 
 
 def main():
-    part_one(map)
     print("#1 -> ", part_one(map))
-    print("#1 -> ", part_two(map))
+    print("#2 -> ", part_two(map))
 
 
 main()
