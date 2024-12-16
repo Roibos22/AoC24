@@ -54,11 +54,11 @@ def make_move(map, pos, move):
 
     return pos
 
-def gps_sum(map):
+def gps_sum(map, char):
     res = 0
     for y, row in enumerate(map):
-        for x, char in enumerate(row):
-            if char == 'O':
+        for x, c in enumerate(row):
+            if c == char:
                 res += 100 * y + x
     return res
 
@@ -67,7 +67,7 @@ def part_one(map, moves):
     for move in moves:
         if is_move_possible(map, pos, move):
             pos = make_move(map, pos, move)
-    return(gps_sum(map))
+    return(gps_sum(map, 'O'))
 
 def convert_map(map):
     new_map = []
@@ -88,61 +88,42 @@ def convert_map(map):
 
 def make_move_2(map, pos, move):
     dx, dy = dirs[move]
-    next_x, next_y = pos
-    boxes = []
+    boxes = [pos]
 
-    while(42):
-        possible = True
-        check_more = False
-        current_boxes = [(next_x, next_y)]
-        boxes.extend(current_boxes)
-        print("boxes", boxes)
-        
-        new_boxes = []
-        for box in boxes:
-            next_x = box[0] + dx
-            next_y = box[1] + dy
-            if map[next_y][next_x] == '[':
-                new_boxes.extend([(next_x, next_y), (next_x + 1, next_y)])
-                check_more = True
-            elif map[next_y][next_x] == ']':
-                new_boxes.extend([(next_x, next_y), (next_x - 1, next_y)])
-                check_more = True
-            elif map[next_y][next_x] == '#':
-                possible = False
-                return pos
-        
-        if not check_more:
-            break
-            
-        boxes.extend(new_boxes)
-        boxes = list(set(boxes))
-        print("1")
-    
-    print("real:", boxes)
-        # print(boxes)
-    print("SET")
-    boxes = list(set(boxes))
-    print(boxes)
-    # for box in boxes:
-    #     print(box)
+    for box in boxes:
+        next_pos = (box[0] + dx, box[1] + dy)
+        if next_pos in boxes:
+            continue
+        if map[next_pos[1]][next_pos[0]] == "[":
+            boxes.append(next_pos)
+            boxes.append((next_pos[0] + 1, next_pos[1]))
+        if map[next_pos[1]][next_pos[0]] == "]":
+            boxes.append(next_pos)
+            boxes.append((next_pos[0] - 1, next_pos[1]))
+        if map[next_pos[1]][next_pos[0]] == "#":
+            return pos
 
-    return pos
+    new_positions = []
+    for box in boxes:
+        new_positions.append(((box[0] + dx, box[1] + dy),  map[box[1]][box[0]]))
+        map[box[1]][box[0]] = '.'
+    for box in new_positions:
+        map[box[0][1]][box[0][0]] = box[1]
+
+    return get_start_pos(map)
 
 def part_two(map, moves):
     map = convert_map(map)
-    print_map(map)
     pos = get_start_pos(map)
-    print(pos)
     for move in moves:
-        if is_move_possible(map, pos, move):
-            pos = make_move_2(map, pos, move)
-   # return(gps_sum(map))
+        pos = make_move_2(map, pos, move)
+    return(gps_sum(map, '['))
 
 
 def main():
     map, moves = parse_data(filename)
-    #print("#1 -> ", part_one(map, moves))
+    print("#1 -> ", part_one(map, moves))
     map, moves = parse_data(filename)
     print("#2 -> ", part_two(map, moves))
+
 main()
