@@ -38,32 +38,27 @@ def part_one(connections):
 
 def part_two(connections):
     networks = []
-    seen = set()
-    #print(connections)
+    map = {}
+    for a, b in connections:
+        map.setdefault(a, set()).add(b)
+        map.setdefault(b, set()).add(a)
+
     for cp1, cp2 in connections:
         added = False
         for network in networks:
             if cp1 in network and cp2 not in network:
-                has_connection_to_all = True
-                for cp in network:
-                    if (cp, cp2) not in networks and (cp2, cp) not in networks and cp is not cp1:
-                        has_connection_to_all = False
-                if has_connection_to_all:
-                    network.append(cp2) 
+                if all(cp2 in map[cp] or cp is cp1 for cp in network):
+                    network.append(cp2)
                     added = True
                     break
             elif cp2 in network and cp1 not in network:
-                has_connection_to_all = True
-                for cp in network:
-                    if (cp, cp1) not in connections and (cp1, cp) not in connections and cp is not cp2:
-                        has_connection_to_all = False
-                if has_connection_to_all:
-                    network.append(cp1) 
+                if all(cp1 in map[cp] or cp is cp2 for cp in network):
+                    network.append(cp1)
                     added = True
                     break
         if not added:
-            new = [cp1, cp2]
-            networks.append(new)
+            networks.append([cp1, cp2])
+
     return(",".join(sorted(max(networks, key=len))))
 
 def main():
