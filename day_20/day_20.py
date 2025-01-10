@@ -10,6 +10,7 @@ def print_map(map):
     for row in map:
         wide_chars = [str(char).center(3) if char != "'" else "   " for char in row]
         print(''.join(wide_chars))
+    print()
 
 def in_range(x, y, map):
     return (
@@ -110,27 +111,33 @@ def get_targets(path, map, delay):
         targets.append((pos, pos_targets))
     return targets
 
+def get_reachables(map, path_pos, radius):
+    reachables = set()
+    for dx in range(-radius, radius + 1):
+        for dy in range(-radius + abs(dx), radius - abs(dx) + 1):
+            nx, ny = path_pos[0] + dx, path_pos[1] + dy
+            if 0 <= nx < len(map) and 0 <= ny < len(map[0]):
+                if ((nx, ny) != path_pos):
+                    if (map[ny][nx] != '#'):
+                        reachables.add((nx, ny))
+    return reachables
+
 def part_two():
     shortcuts = {}
     map = [list(line.strip()) for line in open(filename)]
     path = bfs(map, get_start(map))
-    targets = get_targets(path, map, 20)
     map = add_path_to_map(map, path)
-    for pos_and_targets in targets:
-        #print(pos_and_targets)
-        pos = pos_and_targets[0]
-        for target in pos_and_targets[1]:
-            #print(target)
-            saved = map[target[1]][target[0]] - map[pos[1]][pos[0]] - 20
-            if saved > 0:
-                shortcuts[saved] = shortcuts.get(saved, 0) + 1
-    print(shortcuts)
-    #print_map(map)
-    #shortcuts = find_shortcuts_2(path, map, 20)
-    #print("Shortcuts:", shortcuts)
-    #return sum(value for key, value in shortcuts.items() if key >= 50)
+    for path_pos in path:
+        reachables = get_reachables(map, path_pos, 20)
+        for target in reachables:
+            steps = abs(path_pos[0] - target[0]) + abs(path_pos[1] - target[1])
+            time_safed = map[target[1]][target[0]] - map[path_pos[1]][path_pos[0]] - steps
+            if (time_safed >= 100):
+                shortcuts[time_safed] = shortcuts.get(time_safed, 0) + 1
+    return sum(value for key, value in shortcuts.items())
 
 def main():
     print("#1 -> ", part_one())
     print("#2 -> ", part_two())
+
 main()
